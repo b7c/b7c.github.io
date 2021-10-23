@@ -1,0 +1,918 @@
+<html>
+  <head>
+    <title>Inventory</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <style>
+      body, html {
+        margin: 0px;
+        padding: 0px;
+      }
+
+      #app {
+        padding: 4px;
+      }
+
+      .search { padding: 4px; }
+
+      .item-container {
+        margin: 4px;
+        display: flex;
+        flex: 1 1 0px;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-content: center;
+      }
+
+      .item {
+        width: 50px;
+        height: 50px;
+        border: 1px solid gray;
+        border-radius: 4px;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        user-select: none;
+      }
+
+      .item:hover {
+        background-color: #ddd;
+      }
+
+      .item > * { grid-column: 1; grid-row: 1; }
+
+      .item-image {
+        align-self: center;
+        justify-self: center;
+      }
+
+      .item-count {
+        margin: 2px;
+        padding: 0px 2px;
+        align-self: end;
+        justify-self: end;
+        font-size: 11px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="search">
+        Search
+        <input type="text" v-model="searchText">
+      </div>
+      <div class="item-container">
+        <div v-for="item in filteredItems" class="item" v-bind:title="item.name">
+          <div class="item-image">
+            <img v-bind:src="getImageUrl(item)">
+          </div>
+          <div class="item-count">
+            {{ item.count }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          searchText: '',
+          items: [
+  {
+    "name": "Rubber Duck",
+    "revision": 48082,
+    "identifier": "duck",
+    "variant": "",
+    "count": 502
+  },
+  {
+    "name": "Brown Dragon Lamp",
+    "revision": 66468,
+    "identifier": "rare_colourable_dragonlamp_4",
+    "variant": "",
+    "count": 228
+  },
+  {
+    "name": "Futuristic Rubik\u0027s Cube",
+    "revision": 66681,
+    "identifier": "vwave_c21_rubiks",
+    "variant": "",
+    "count": 170
+  },
+  {
+    "name": "Sardines",
+    "revision": 48002,
+    "identifier": "petfood2",
+    "variant": "",
+    "count": 119
+  },
+  {
+    "name": "Cabbage",
+    "revision": 48002,
+    "identifier": "petfood3",
+    "variant": "",
+    "count": 119
+  },
+  {
+    "name": "Doggy Bones",
+    "revision": 48002,
+    "identifier": "petfood1",
+    "variant": "",
+    "count": 119
+  },
+  {
+    "name": "Panther Wall Cover",
+    "revision": 56746,
+    "identifier": "bling11_wall4",
+    "variant": "",
+    "count": 87
+  },
+  {
+    "name": "Cash Patch",
+    "revision": 56737,
+    "identifier": "jetset_moneypatch",
+    "variant": "",
+    "count": 75
+  },
+  {
+    "name": "Indian Sunset",
+    "revision": 65636,
+    "identifier": "india_c20_sunsetbg",
+    "variant": "",
+    "count": 69
+  },
+  {
+    "name": "A Free Crown",
+    "revision": 66763,
+    "identifier": "clothing_darkcrown",
+    "variant": "",
+    "count": 51
+  },
+  {
+    "name": "Zebra Wall Cover",
+    "revision": 56746,
+    "identifier": "bling11_wall2",
+    "variant": "",
+    "count": 43
+  },
+  {
+    "name": "Miami Streetlight",
+    "revision": 66681,
+    "identifier": "vwave_c21_streetlight",
+    "variant": "",
+    "count": 32
+  },
+  {
+    "name": "Miami Fan Palm",
+    "revision": 66681,
+    "identifier": "vwave_c21_palm",
+    "variant": "",
+    "count": 32
+  },
+  {
+    "name": "Birthday Ballroom Screen",
+    "revision": 65782,
+    "identifier": "habbo20_c20_artdecobackdrop",
+    "variant": "",
+    "count": 28
+  },
+  {
+    "name": "Golden Toilet",
+    "revision": 56746,
+    "identifier": "bling_toilet",
+    "variant": "",
+    "count": 26
+  },
+  {
+    "name": "Miami Railing",
+    "revision": 66681,
+    "identifier": "vwave_c21_railing",
+    "variant": "",
+    "count": 24
+  },
+  {
+    "name": "Tiger Wall Cover",
+    "revision": 56746,
+    "identifier": "bling11_wall1",
+    "variant": "",
+    "count": 23
+  },
+  {
+    "name": "Crazed Rorshach Inkblot",
+    "revision": 48082,
+    "identifier": "cubie_decal_0",
+    "variant": "",
+    "count": 18
+  },
+  {
+    "name": "Bullet Hole",
+    "revision": 56746,
+    "identifier": "det_bhole",
+    "variant": "",
+    "count": 15
+  },
+  {
+    "name": "Flame Trap",
+    "revision": 63598,
+    "identifier": "hween_c17_bonfire",
+    "variant": "",
+    "count": 15
+  },
+  {
+    "name": "Invisible Block",
+    "revision": 66784,
+    "identifier": "room_invisible_block",
+    "variant": "",
+    "count": 14
+  },
+  {
+    "name": "Camera Pic",
+    "revision": 58856,
+    "identifier": "external_image_wallitem_poster_small",
+    "variant": "",
+    "count": 9
+  },
+  {
+    "name": "Digitized Railing",
+    "revision": 66681,
+    "identifier": "vwave_c21_glitchrailing",
+    "variant": "",
+    "count": 8
+  },
+  {
+    "name": "Bubble Seat",
+    "revision": 64132,
+    "identifier": "coralking_c18_bubbleseat",
+    "variant": "",
+    "count": 7
+  },
+  {
+    "name": "Tea set",
+    "revision": 54764,
+    "identifier": "hween13_teaset",
+    "variant": "",
+    "count": 5
+  },
+  {
+    "name": "Club sofa",
+    "revision": 45508,
+    "identifier": "club_sofa",
+    "variant": "",
+    "count": 5
+  },
+  {
+    "name": "Wardrobe",
+    "revision": 45512,
+    "identifier": "doorB",
+    "variant": "",
+    "count": 4
+  },
+  {
+    "name": "Witch Robes",
+    "revision": 65185,
+    "identifier": "clothing_witchrobes",
+    "variant": "",
+    "count": 3
+  },
+  {
+    "name": "WIRED Effect: Toggle Furni State",
+    "revision": 50950,
+    "identifier": "wf_act_toggle_state",
+    "variant": "",
+    "count": 3
+  },
+  {
+    "name": "Solo Glass Door",
+    "revision": 49718,
+    "identifier": "val14_door",
+    "variant": "",
+    "count": 3
+  },
+  {
+    "name": "Skinny Tree",
+    "revision": 65568,
+    "identifier": "easter_c20_foresttree",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Bling Divan",
+    "revision": 56746,
+    "identifier": "bling11_sofa",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Day of the Dead Altar Piece",
+    "revision": 54892,
+    "identifier": "hween14_altarpieces1",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "WIRED Trigger: User Walks Off Furni",
+    "revision": 50950,
+    "identifier": "wf_trg_walks_off_furni",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Jolly Roger",
+    "revision": 56783,
+    "identifier": "poster501",
+    "variant": "501",
+    "count": 2
+  },
+  {
+    "name": "Clouds of the Habbocalypse",
+    "revision": 60192,
+    "identifier": "hween_c15_evilcloud",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Not so tall tree",
+    "revision": 56737,
+    "identifier": "anc_comfy_tree",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Flared Trench Coat",
+    "revision": 65308,
+    "identifier": "clothing_flaredtrench",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Rock Teleport",
+    "revision": 48177,
+    "identifier": "picnic_tele",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Sapphire Welly Planter",
+    "revision": 66168,
+    "identifier": "bonusrare21_3_6",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Posh Waiter Outfit",
+    "revision": 61703,
+    "identifier": "clothing_tuxoutfit",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Jungle Drum Plant",
+    "revision": 62178,
+    "identifier": "jungle_c16_plant",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Christmas Duck",
+    "revision": 55667,
+    "identifier": "xmasduck",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Bulrush",
+    "revision": 48082,
+    "identifier": "plant_bulrush",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "Search Light",
+    "revision": 57419,
+    "identifier": "cpunk_c15_searchlight",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "WIRED Trigger: User Walks On Furni",
+    "revision": 50950,
+    "identifier": "wf_trg_walks_on_furni",
+    "variant": "",
+    "count": 2
+  },
+  {
+    "name": "6x6 Stack Magic Tile",
+    "revision": 66804,
+    "identifier": "tile_stackmagic6x6",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Ballroom Dinner Table",
+    "revision": 65782,
+    "identifier": "habbo20_c20_glitzytable",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Mushroom Hat",
+    "revision": 64783,
+    "identifier": "clothing_mushroomhat",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Birthday Ballroom Balloons",
+    "revision": 65782,
+    "identifier": "habbo20_c20_balloons",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Bohemian Forest Lamp",
+    "revision": 64917,
+    "identifier": "fest_c19_lamp",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "31 Days of HC",
+    "revision": 62890,
+    "identifier": "hc_gift_31days",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Dormant Zombie",
+    "revision": 63598,
+    "identifier": "hween_c17_zombiesleep",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Sapphire Capybara",
+    "revision": 66220,
+    "identifier": "rare_prize21_10",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Voodoo Throne",
+    "revision": 45508,
+    "identifier": "hween10_throne",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Blue Spotted Teapot",
+    "revision": 66168,
+    "identifier": "bonusrare21_2_4",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Big Purple Fridge",
+    "revision": 56746,
+    "identifier": "bling_fridge",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Levitating Floor Tiles",
+    "revision": 65975,
+    "identifier": "hween_c20_brokenfloor",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Scroll Altar (crafting table)",
+    "revision": 66779,
+    "identifier": "hween_c21_scrollaltar",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "8x8 Stack Magic Tile",
+    "revision": 66804,
+    "identifier": "tile_stackmagic8x8",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Metal Gate",
+    "revision": 54764,
+    "identifier": "hween13_gate_1",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Cyber Building 2",
+    "revision": 57419,
+    "identifier": "cpunk_c15_building2",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Habb-O Gaming Console",
+    "revision": 65782,
+    "identifier": "rainyday_c20_retrogames",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Long Mohawk",
+    "revision": 65052,
+    "identifier": "clothing_longmohawk",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Ghostly Mirror",
+    "revision": 54764,
+    "identifier": "hween09_mirror",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Zen Glass Pond",
+    "revision": 64376,
+    "identifier": "zengarden_c18_glasspond",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Suave Chair",
+    "revision": 56746,
+    "identifier": "bling_chair_b",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Solar Gremlin",
+    "revision": 65059,
+    "identifier": "suncity_c19_munchling",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Stack Magic Tile",
+    "revision": 51306,
+    "identifier": "tile_stackmagic",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Zen Bonsai Tree",
+    "revision": 64376,
+    "identifier": "zengarden_c18_rootplant",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Coral Gazebo",
+    "revision": 64132,
+    "identifier": "coralking_c18_gazebo",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "2x2 Stack Magic Tile",
+    "revision": 51306,
+    "identifier": "tile_stackmagic2",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Orange Spotted Teapot",
+    "revision": 66168,
+    "identifier": "bonusrare21_2_1",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Black Adobe Skull Gate",
+    "revision": 54892,
+    "identifier": "hween14_gate",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Pink Spotted Teapot",
+    "revision": 66168,
+    "identifier": "bonusrare21_2_0",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Adonis Statue",
+    "revision": 56746,
+    "identifier": "gift_manlystatue",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Birch Tree",
+    "revision": 65185,
+    "identifier": "hween_c19_birchtree",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "WIRED Trigger: Furni State Is Changed",
+    "revision": 50950,
+    "identifier": "wf_trg_state_changed",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Blue Bow Lion",
+    "revision": 66057,
+    "identifier": "plushie_c20_bluelion2",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Green Spotted Teapot",
+    "revision": 66168,
+    "identifier": "bonusrare21_2_5",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Ruby Welly Planter",
+    "revision": 66168,
+    "identifier": "bonusrare21_3_3",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "WIRED Effect: Teleport To Furni",
+    "revision": 50950,
+    "identifier": "wf_act_teleport_to",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "WIRED Effect: Bot changes clothes",
+    "revision": 57492,
+    "identifier": "wf_act_bot_clothes",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "WIRED Trigger: User Says Keyword",
+    "revision": 50950,
+    "identifier": "wf_trg_says_something",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Battered Spy Equipment",
+    "revision": 66681,
+    "identifier": "vwave_c21_brokentech",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Egg Plant",
+    "revision": 51306,
+    "identifier": "easter14_eggplant",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Tall Fall Tree",
+    "revision": 65967,
+    "identifier": "autumn_c20_tree3",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Tall tree",
+    "revision": 56746,
+    "identifier": "anc_talltree",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "The Vines Of Love",
+    "revision": 57144,
+    "identifier": "val12_vines",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Blue Flower",
+    "revision": 50156,
+    "identifier": "easter13_flower_2",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Spiky Cactus",
+    "revision": 56737,
+    "identifier": "wildwest_cactus2",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Hanging Love Flower",
+    "revision": 57144,
+    "identifier": "val12_flower",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Aquamarine Capybara",
+    "revision": 66220,
+    "identifier": "rare_prize21_8",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Background Toner",
+    "revision": 45508,
+    "identifier": "roombg_color",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Farmyard Windmill",
+    "revision": 63034,
+    "identifier": "easter_c17_windmill",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Digitizer (Crafting Table)",
+    "revision": 66681,
+    "identifier": "vwave_c21_pc",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Mossy Stone Trap",
+    "revision": 66779,
+    "identifier": "hween_c21_stonetrap",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Blood on the Floor",
+    "revision": 64390,
+    "identifier": "hween_c18_bloodfloorstreak",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "\u0027Be Kind\u0027 Machine",
+    "revision": 66057,
+    "identifier": "antibully_machine",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "starter chair",
+    "revision": 45508,
+    "identifier": "noob_chair_tradeable_5",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Big Torch",
+    "revision": 56746,
+    "identifier": "LT_pillar",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Mannequin",
+    "revision": 56746,
+    "identifier": "boutique_mannequin1",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Zen Uplighter",
+    "revision": 64376,
+    "identifier": "zengarden_c18_light",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Perfect Lagoon Water",
+    "revision": 66546,
+    "identifier": "thai_c21_crystalwater",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Badge Display Case",
+    "revision": 45561,
+    "identifier": "badge_display",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Emerald Capybara",
+    "revision": 66220,
+    "identifier": "rare_prize21_6",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Random Banzai Teleporter",
+    "revision": 48478,
+    "identifier": "bb_rnd_tele",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "4x4 Stack Magic Tile",
+    "revision": 66804,
+    "identifier": "tile_stackmagic4x4",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Miami Parking Meter",
+    "revision": 66681,
+    "identifier": "vwave_c21_parkingmeter",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Dark Pura Single Bed (Grey)",
+    "revision": 61856,
+    "identifier": "purablk_c16_bedone_3",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Hand Carved Mexican Chair",
+    "revision": 54892,
+    "identifier": "hween14_chair",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Laboratory Skylight",
+    "revision": 64390,
+    "identifier": "hween_c18_ceilingrays",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Amber Welly Planter",
+    "revision": 66168,
+    "identifier": "bonusrare21_3_1",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Mossy Zen Rocks",
+    "revision": 64376,
+    "identifier": "zengarden_c18_moss",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Emergency Torch",
+    "revision": 64390,
+    "identifier": "hween_c18_flashlight",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Suave Chair",
+    "revision": 56746,
+    "identifier": "bling_chair_c",
+    "variant": "",
+    "count": 1
+  },
+  {
+    "name": "Tapes from Goa",
+    "revision": 45508,
+    "identifier": "song_disk",
+    "variant": "",
+    "count": 1
+  }
+]
+        },
+        methods: {
+          getImageUrl(item) {
+            return `https://images.habbo.com/dcr/hof_furni/${item.revision}/${item.identifier}_icon.png`;
+          }
+        },
+        computed: {
+          filteredItems() {
+            return this.items.filter(item => {
+              return item.name.toLowerCase().indexOf(this.searchText.toLowerCase()) > -1;
+            });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
